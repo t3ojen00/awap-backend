@@ -1,5 +1,6 @@
 const express = require('express');
 const { authToken } = require('../config/auth');
+const { User } = require('../dto/UserClass');
 //const db = require('../config/db');
 
 
@@ -29,24 +30,25 @@ userRouter.get('/:user_id', authToken, async (req, res) => {
 
 
 //registeration to the site
-  userRouter.post("/registeration", async (req, res) => {
-    bcrypt.hash(req.body.password, 10, async (err, hash) => {
-      if (!err) {
-        try {
-          const sql = "INSERT INTO Users (email, password_hash) VALUES ($1,$2) RETURNING user_id"
-          const result = await db.query(sql, [req.body.email, hash])
-          res.status(200).json({ id: result.rows[0].id })
-        } catch (error) {
-          res.statusMessage = error
-          res.status(500).json({ error: error })
-        }
-      } else {
-        res.statusMessage = err
-        res.status(500).json({ error: err })
-      }
-    })
-  })
+userRouter.post('/registration', async (req, res) => {
+    try {
+      const { email, password } = req.body;
 
+      if (!email || !password) {
+        return res.status(400).send({ error: 'Email and password are required' });
+      }
+
+      const hash = await bcrypt.hash(password, 10);
+
+      const sql = 'INSERT INTO Users (email, password_hash) VALUES ($1, $2) RETURNING user_id';
+      const result = await db.query(sql, [email, hash]);
+
+      res.status(200).json({ id: result.rows[0].user_id });
+    } catch (error) {
+      console.error('Error during registration:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
   module.exports = {
     userRouter,
   }

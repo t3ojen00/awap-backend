@@ -1,0 +1,29 @@
+### Get User Information
+# GET http://localhost:3000/user/1
+# Authorization: Bearer token_here
+
+### Register a New User
+POST http://localhost:3000/users/registration
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "test"
+}
+
+### Log In to Get Token
+POST http://localhost:3000/users/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "test"
+}
+
+### Log Out User
+POST http://localhost:3000/users/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTczMTQzNDkyMywiZXhwIjoxNzMxNDM4NTIzfQ.jcic7Mwf06tudq77g8hYk4PuLz-oDZTi2Ccya0LGGvg
+
+### Delete User by ID
+DELETE http://localhost:3000/users/delete/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTczMTQzNDkyMywiZXhwIjoxNzMxNDM4NTIzfQ.jcic7Mwf06tudq77g8hYk4PuLz-oDZTi2Ccya0LGGvg

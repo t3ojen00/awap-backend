@@ -3,6 +3,7 @@ const { authToken } = require("../config/auth");
 const { User } = require("../dto/UserClass");
 const bcrypt = require("bcrypt");
 const db = require("../config/db");
+const jwt = require("jsonwebtoken"); // H add
 
 console.log("user router executed");
 const userRouter = express.Router();
@@ -49,6 +50,28 @@ userRouter.post("/registration", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+//logout//H
+userRouter.post("/logout", authToken, (req, res) => {
+  try {
+    return res.status(200).json({ message: "Successfully logged out" });
+  } catch (error) {
+    console.error("Error during logout:", error);
+    return res.status(500).json({ error: "Logout failed" });
+  }
+});
+
+//delete//H
+userRouter.delete("/delete/:id", authToken, (req, res, next) => {
+  const id = parseInt(req.params.id, 10);
+  db.query("DELETE FROM Users WHERE user_id = $1", [id], (error, result) => {
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+    return res.status(200).json({ id: id });
+  });
+});
+
 module.exports = {
   userRouter,
 };

@@ -7,12 +7,12 @@ POST http://localhost:3000/users/registration
 Content-Type: application/json
 
 {
-  "email": "test@example.com",
+  "email": "test123@example.com",
   "password": "test"
 }
 
 ### Log In to Get Token
-POST http://localhost:3000/users/login
+POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {

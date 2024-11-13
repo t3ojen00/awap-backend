@@ -4,6 +4,7 @@ const { User } = require("../dto/UserClass");
 const bcrypt = require("bcrypt");
 const db = require("../config/db");
 const jwt = require("jsonwebtoken"); // H add
+const { hash, compare } = require("bcrypt"); //H add
 
 console.log("user router executed");
 const userRouter = express.Router();

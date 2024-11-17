@@ -1,10 +1,12 @@
 const express = require("express");
 const { authToken } = require("./config/auth.js"); // get the authentication working
 const { userRouter } = require("./routes/userRoutes.js");
-const { authRouter } = require("./routes/authRoute.js");
-const { moviesRoutes } = require('./routes/moviesRoute'); // -sort by genre-
+//const { authRouter } = require("./routes/authRoute.js");
+const { moviesRouter } = require('./routes/moviesRoute'); // -sort by genre-
 const app = express();
 const port = process.env.PORT || 3000;
+
+console.log('movie router in index');
 
 app.use(express.json());
 
@@ -17,8 +19,8 @@ app.get("/protected", authToken, (req, res) => {
 });
 
 app.use("/users", userRouter);
-app.use("/auth", authRouter);
-app.use('/api', moviesRoutes); // -sort by genre-
+//app.use("/auth", authRouter);
+app.use('/api', moviesRouter); // -sort by genre-
 
 
 app.listen(port, () => {

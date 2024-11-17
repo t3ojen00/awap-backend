@@ -3,6 +3,8 @@ const axios = require('axios'); // Fetching Finnkino API with axios
 const xml2js = require('xml2js'); // Library to parse XML data
 const moviesRouter = express.Router();
 
+console.log('movie router running');
+
 // Endpoint to fetch and filter movies by genre
 moviesRouter.get('/movies/genre/:genre', async (req, res) => {
     const { genre } = req.params; // Get the genre from the URL

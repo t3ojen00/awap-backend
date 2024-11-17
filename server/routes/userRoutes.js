@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const db = require("../config/db");
 const jwt = require("jsonwebtoken"); // H add
 const { hash, compare } = require("bcrypt"); //H add
+const pool = require("../config/db");
 
 console.log("user router executed");
 const userRouter = express.Router();
@@ -72,6 +73,42 @@ userRouter.delete("/delete/:id", authToken, (req, res, next) => {
     return res.status(200).json({ id: id });
   });
 });
+
+// Login route
+userRouter.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Check if the user exists
+    const userQuery = "SELECT * FROM Users WHERE email = $1";
+    const { rows } = await pool.query(userQuery, [email]);
+    const user = rows[0];
+
+    if (!user) {
+      return res.status(400).json({ error: "Invalid email or password" });
+    }
+
+    // Compare the password hash
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: "Invalid email or password" });
+    }
+
+    // Generate a JWT token
+    const token = jwt.sign(
+      { userId: user.user_id, email: user.email },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "15h" } // Token expiration
+    );
+
+    // Send the token to the client
+    res.json({ message: "Login successful", token });
+  } catch (error) {
+    console.error("Error logging in:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 
 module.exports = {
   userRouter,

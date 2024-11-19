@@ -39,6 +39,14 @@ userRouter.post("/registration", async (req, res) => {
     if (!email || !password) {
       return res.status(400).send({ error: "Email and password are required" });
     }
+    //query to check if the email already exists
+
+    const existingEmail = "SELECT * FROM Users WHERE email = $1";
+    const { rows } = await pool.query(existingEmail, [email]);
+
+    if (rows.length > 0) {
+      return res.status(400).json({ error: "Email already exists" });
+    }
 
     const hash = await bcrypt.hash(password, 10);
 
@@ -102,13 +110,17 @@ userRouter.post("/login", async (req, res) => {
     );
 
     // Send the token to the client
-    res.json({ message: "Login successful", token });
+    res.json({
+      message: "Login successful",
+      token,
+      userId: user.user_id,
+      email: user.email,
+    });
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
 
 module.exports = {
   userRouter,

@@ -1,13 +1,15 @@
 const express = require("express");
+const cors = require("cors");
 const { authToken } = require("./config/auth.js"); // get the authentication working
 const { userRouter } = require("./routes/userRoutes.js");
 //const { authRouter } = require("./routes/authRoute.js");
-const { moviesRouter } = require('./routes/moviesRoute'); // -sort by genre-
+const { moviesRouter } = require("./routes/moviesRoute"); // -sort by genre-
 const app = express();
 const port = process.env.PORT || 3000;
 
-console.log('movie router in index');
+console.log("movie router in index");
 
+app.use(cors());
 app.use(express.json());
 
 //authentication should be working
@@ -20,8 +22,7 @@ app.get("/protected", authToken, (req, res) => {
 
 app.use("/users", userRouter);
 //app.use("/auth", authRouter);
-app.use('/api', moviesRouter); // -sort by genre-
-
+app.use("/api", moviesRouter); // -sort by genre-
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

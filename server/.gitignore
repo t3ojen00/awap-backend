@@ -3,3 +3,6 @@
 .env
 
 node_modules/
+
+# Ignore node_model directory
+/node_model

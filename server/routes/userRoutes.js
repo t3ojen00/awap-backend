@@ -13,18 +13,29 @@ const userRouter = express.Router();
 // get the user id to the db and use the auth.js to keep the same user logged in
 userRouter.get("/:user_id", authToken, async (req, res) => {
   try {
-    const userId = parseInt(req.params.id, 10);
+    const userId = parseInt(req.params.user_id, 10); //user_id
     if (isNaN(userId)) {
       return res.status(400).send({ error: "User ID must be a number" });
     }
 
-    const userInfo = await getUserInformation(userId);
+    // const userInfo = await getUserInformation(userId);
 
-    if (userInfo.length === 0) {
+    // if (userInfo.length === 0) {
+    //   return res.status(404).send({ error: "User not found" });
+    // }
+
+    // res.json(userInfo[0]);
+
+    //Dont have getUserInformation, cannot await, how about this way:
+    const result = await db.pool.query(
+      "SELECT * FROM users WHERE user_id = $1",
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
       return res.status(404).send({ error: "User not found" });
     }
-
-    res.json(userInfo[0]);
+    res.json(result.rows[0]);
   } catch (error) {
     console.error("Failed to get user information:", error);
     res.status(500).send({ error: "Internal Server Error" });
@@ -42,10 +53,19 @@ userRouter.post("/registration", async (req, res) => {
     //query to check if the email already exists
 
     const existingEmail = "SELECT * FROM Users WHERE email = $1";
-    const { rows } = await pool.query(existingEmail, [email]);
+    const { rows } = await db.pool.query(existingEmail, [email]);
 
     if (rows.length > 0) {
       return res.status(400).json({ error: "Email already exists" });
+    }
+
+    // Password need least one capital letter and one number-H add
+    const passwordRequried = /^(?=.*[A-Z])(?=.*\d).+$/;
+    if (!passwordRequried.test(password)) {
+      return res.status(400).json({
+        error:
+          "Password must contain at least one capital letter and one number.",
+      });
     }
 
     const hash = await bcrypt.hash(password, 10);
@@ -74,12 +94,26 @@ userRouter.post("/logout", authToken, (req, res) => {
 //delete//H
 userRouter.delete("/delete/:id", authToken, (req, res, next) => {
   const id = parseInt(req.params.id, 10);
-  db.query("DELETE FROM Users WHERE user_id = $1", [id], (error, result) => {
-    if (error) {
-      return res.status(500).json({ error: error.message });
+
+  if (isNaN(id)) {
+    return res.status(400).json({ message: "Invalid user ID." });
+  }
+
+  db.query(
+    "DELETE FROM Users WHERE user_id = $1 RETURNING *",
+    [id],
+    (error, result) => {
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      // if (result.rowCount === 0) {
+      //   return res.status(404).json({ message: "User not found." });
+      // }
+
+      return res.status(200).json({ message: "User deleted successfully" });
     }
-    return res.status(200).json({ id: id });
-  });
+  );
 });
 
 // Login route
@@ -89,7 +123,7 @@ userRouter.post("/login", async (req, res) => {
   try {
     // Check if the user exists
     const userQuery = "SELECT * FROM Users WHERE email = $1";
-    const { rows } = await pool.query(userQuery, [email]);
+    const { rows } = await db.pool.query(userQuery, [email]);
     const user = rows[0];
 
     if (!user) {

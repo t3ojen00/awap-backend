@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const fs = require("fs");
 const path = require("path");
-const db = require("./db"); // Import db with pool and query
+const pool = require("../config/db");
 const jwt = require("jsonwebtoken");
 const { hash } = bcrypt;
 const { sign } = jwt;
@@ -30,7 +30,7 @@ const insertTestUser = async (email, password) => {
     });
 
     // Insert the user and return the userId
-    const result = await db.pool.query(
+    const result = await pool.query(
       "INSERT INTO Users (email, password_hash) VALUES ($1, $2) RETURNING user_id",
       [email, hashedPassword]
     );

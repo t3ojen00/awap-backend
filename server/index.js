@@ -4,6 +4,7 @@ const { authToken } = require("./config/auth.js"); // get the authentication wor
 const { userRouter } = require("./routes/userRoutes.js");
 //const { authRouter } = require("./routes/authRoute.js");
 const { moviesRouter } = require("./routes/moviesRoute"); // -sort by genre-
+const { groupRouter } = require("./routes/groupRoutes.js"); //groupRoutes
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -23,6 +24,8 @@ app.get("/protected", authToken, (req, res) => {
 app.use("/users", userRouter);
 //app.use("/auth", authRouter);
 app.use("/api", moviesRouter); // -sort by genre-
+
+app.use("/groups", groupRouter); // route group
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

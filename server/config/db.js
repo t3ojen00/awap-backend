@@ -12,15 +12,6 @@ const pool = new Pool({
   port: process.env.DB_PORT,
 });
 
-// module.exports.query = (text, params, callback) => {
-//   return pool.query(text, params, callback);
-// };
-
-const db = {
-  pool, // Export db
-  query: (text, params, callback) => {
-    return pool.query(text, params, callback);
-  },
+module.exports.query = (text, params, callback) => {
+  return pool.query(text, params, callback);
 };
-
-module.exports = db; //H add

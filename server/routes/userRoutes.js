@@ -2,7 +2,6 @@ const express = require("express");
 const { authToken } = require("../config/auth");
 const { User } = require("../dto/UserClass");
 const bcrypt = require("bcrypt");
-const db = require("../config/db");
 const jwt = require("jsonwebtoken"); // H add
 const { hash, compare } = require("bcrypt"); //H add
 const pool = require("../config/db");
@@ -27,10 +26,9 @@ userRouter.get("/:user_id", authToken, async (req, res) => {
     // res.json(userInfo[0]);
 
     //Dont have getUserInformation, cannot await, how about this way:
-    const result = await db.pool.query(
-      "SELECT * FROM users WHERE user_id = $1",
-      [userId]
-    );
+    const result = await pool.query("SELECT * FROM users WHERE user_id = $1", [
+      userId,
+    ]);
 
     if (result.rows.length === 0) {
       return res.status(404).send({ error: "User not found" });
@@ -53,7 +51,7 @@ userRouter.post("/registration", async (req, res) => {
     //query to check if the email already exists
 
     const existingEmail = "SELECT * FROM Users WHERE email = $1";
-    const { rows } = await db.pool.query(existingEmail, [email]);
+    const { rows } = await pool.query(existingEmail, [email]);
 
     if (rows.length > 0) {
       return res.status(400).json({ error: "Email already exists" });
@@ -72,7 +70,7 @@ userRouter.post("/registration", async (req, res) => {
 
     const sql =
       "INSERT INTO Users (email, password_hash) VALUES ($1, $2) RETURNING user_id";
-    const result = await db.query(sql, [email, hash]);
+    const result = await pool.query(sql, [email, hash]);
 
     res.status(200).json({ id: result.rows[0].user_id });
   } catch (error) {
@@ -99,7 +97,7 @@ userRouter.delete("/delete/:id", authToken, (req, res, next) => {
     return res.status(400).json({ message: "Invalid user ID." });
   }
 
-  db.query(
+  pool.query(
     "DELETE FROM Users WHERE user_id = $1 RETURNING *",
     [id],
     (error, result) => {
@@ -123,7 +121,7 @@ userRouter.post("/login", async (req, res) => {
   try {
     // Check if the user exists
     const userQuery = "SELECT * FROM Users WHERE email = $1";
-    const { rows } = await db.pool.query(userQuery, [email]);
+    const { rows } = await pool.query(userQuery, [email]);
     const user = rows[0];
 
     if (!user) {

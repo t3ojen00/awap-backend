@@ -5,6 +5,8 @@ const { userRouter } = require("./routes/userRoutes.js");
 //const { authRouter } = require("./routes/authRoute.js");
 const { moviesRouter } = require("./routes/moviesRoute"); // -sort by genre-
 const { groupRouter } = require("./routes/groupRoutes.js"); //groupRoutes
+const { reviewRouter } = require("./routes/reviewRoute.js");
+const { ratingRouter } = require("./routes/ratingRoute.js")
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -26,6 +28,11 @@ app.use("/users", userRouter);
 app.use("/api", moviesRouter); // -sort by genre-
 
 app.use("/groups", groupRouter); // route group
+
+app.use("/reviews", reviewRouter);
+
+app.use("/rating", ratingRouter);
+
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

@@ -27,3 +27,12 @@ Authorization: Bearer <token>
 ### Delete User by ID
 DELETE http://localhost:3000/users/delete/:user_id
 Authorization: Bearer <token>
+
+
+
+POST http://localhost:3000/rating/ HTTP/1.1 
+content-type: application/json
+
+{ "rating":2, "movie_id":123, "user_id":1
+
+}

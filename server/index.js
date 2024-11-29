@@ -7,6 +7,7 @@ const { moviesRouter } = require("./routes/moviesRoute"); // -sort by genre-
 const { groupRouter } = require("./routes/groupRoutes.js"); //groupRoutes
 const { reviewRouter } = require("./routes/reviewRoute.js");
 const { ratingRouter } = require("./routes/ratingRoute.js")
+const createGroupRoutes = require("./routes/createGroupRoutes");
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -32,6 +33,8 @@ app.use("/groups", groupRouter); // route group
 app.use("/reviews", reviewRouter);
 
 app.use("/rating", ratingRouter);
+
+app.use("/createGroups",createGroupRoutes);//
 
 
 app.listen(port, () => {

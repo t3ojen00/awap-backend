@@ -1,6 +1,7 @@
 -- Users table
 CREATE TABLE Users (
     user_id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,   --add username            
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -25,13 +26,41 @@ CREATE TABLE Showtimes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Groups table with foreign key to Users (owner_id)
+--  the Groups table-- 
+CREATE TABLE groups (
+    group_id SERIAL PRIMARY KEY,             
+    owner_id INT NOT NULL,                  
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  
+    FOREIGN KEY (owner_id) REFERENCES users(user_id)  -- Foreign key reference to Users
+);
+
+SELECT 
+    groups.*, 
+    users.name AS owner_name 
+FROM groups 
+JOIN users ON groups.owner_id = users.user_id;
+
+
+-- Insert sample data into Users table 
+INSERT INTO users (name) VALUES 
+    ('John Doe'),
+    ('Jane Smith');
+
+-- Insert sample data into Groups table 
+INSERT INTO groups (group_name, owner_id) VALUES 
+    ('Group A', 1),  
+    ('Group B', 2);  
+
+
+
+
+/*-- Groups table with foreign key to Users (owner_id)
 CREATE TABLE Groups (
     group_id SERIAL PRIMARY KEY,
     group_name VARCHAR(100) NOT NULL,
     owner_id INT REFERENCES Users(user_id) ON DELETE CASCADE,  -- Foreign key to Users table
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+);*/
 
 -- GroupMemberships join table for many-to-many relationship between Users and Groups
 CREATE TABLE GroupMemberships (

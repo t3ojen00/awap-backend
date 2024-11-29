@@ -1,0 +1,28 @@
+### Create a Group
+POST http://localhost:3000/createGroups
+Content-Type: application/json
+
+{
+  "group_name": "Group 823",
+  "owner_id": 1
+}
+
+###
+
+### List All Groups
+GET http://localhost:3000/createGroups
+
+###
+
+### View a Group by ID
+GET http://localhost:3000/createGroups/1
+
+###
+
+### Delete a Group (Owner Only)
+DELETE http://localhost:3000/createGroups/1
+Content-Type: application/json
+
+{
+  "owner_id": 1
+}

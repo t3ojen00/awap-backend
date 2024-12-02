@@ -6,10 +6,10 @@ const { userRouter } = require("./routes/userRoutes.js");
 const { moviesRouter } = require("./routes/moviesRoute"); // -sort by genre-
 const { groupRouter } = require("./routes/groupRoutes.js"); //groupRoutes
 const { reviewRouter } = require("./routes/reviewRoute.js");
-const { ratingRouter } = require("./routes/ratingRoute.js")
-const { messageRouter } = require("./routes/messageRoute.js")
+const { ratingRouter } = require("./routes/ratingRoute.js");
+const { messageRouter } = require("./routes/messageRoute.js");
 const editPostRouter = require("./routes/editPostRoute.js");
-const createGroupRoutes = require("./routes/createGroupRoutes");
+// const createGroupRoutes = require("./routes/createGroupRoutes"); //Mowing to /groupRoutes H
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -36,12 +36,11 @@ app.use("/reviews", reviewRouter);
 
 app.use("/rating", ratingRouter);
 
-app.use("/createGroups",createGroupRoutes);//
+// app.use("/createGroups",createGroupRoutes);// moving to groups H
 
 app.use("/messages", messageRouter);
 
-app.use('/forum', editPostRouter);
-
+app.use("/forum", editPostRouter);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

@@ -10,7 +10,12 @@ function authToken(req, res, next) {
 
   jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
     if (err) return res.status(403).json({ message: "Invalid token." });
-    req.user = user;
+    // req.user = user;
+
+    // Map `userId` to `user_id` for consistency// Add for groupRoute
+    req.user = { ...user, user_id: user.userId };
+    // console.log("Decoded JWT:", req.user); // Log for debugging
+
     next();
   }); //change JWT_SECRET -> JWT_SECRET_KEY
 }

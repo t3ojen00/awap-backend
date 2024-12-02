@@ -107,3 +107,12 @@ CREATE TABLE messages (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
+
+-- Adding this temporarily until I fix my code so that it matches Enni's database!
+CREATE TABLE Posts (
+    post_id SERIAL PRIMARY KEY,
+    content TEXT NOT NULL,  -- The main content of the post
+    user_id INT REFERENCES Users(user_id) ON DELETE CASCADE,  -- Foreign key to Users
+    group_id INT REFERENCES Groups(group_id) ON DELETE CASCADE,  -- Foreign key to Groups
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  -- Timestamp for post creation
+);

@@ -8,6 +8,7 @@ const { groupRouter } = require("./routes/groupRoutes.js"); //groupRoutes
 const { reviewRouter } = require("./routes/reviewRoute.js");
 const { ratingRouter } = require("./routes/ratingRoute.js")
 const { messageRouter } = require("./routes/messageRoute.js")
+const editPostRouter = require("./routes/editPostRoute.js");
 const createGroupRoutes = require("./routes/createGroupRoutes");
 const app = express();
 const port = process.env.PORT || 3000;
@@ -38,6 +39,8 @@ app.use("/rating", ratingRouter);
 app.use("/createGroups",createGroupRoutes);//
 
 app.use("/messages", messageRouter);
+
+app.use('/forum', editPostRouter);
 
 
 app.listen(port, () => {

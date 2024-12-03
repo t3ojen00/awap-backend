@@ -15,9 +15,8 @@ const editPostRouter = express.Router();
 editPostRouter.get('/:id', async (req, res) => {
     // get the group_id
     const { id } = req.params
-    console.log(`Received request for groupId: ${id}`);
     try {
-      const query = `SELECT * FROM posts WHERE group_id = $1`;
+      const query = `SELECT * FROM messages WHERE group_id = $1`;
       const { rows } = await db.query(query, [id]);
       return res.status(200).json(rows);
     } catch (error) {
@@ -30,14 +29,14 @@ editPostRouter.get('/:id', async (req, res) => {
 // edit a specific post
 editPostRouter.put('/:id', async (req, res) => {
     const { id } = req.params;
-    const { content } = req.body;
+    const { message } = req.body;
   
-    if (!content) {
+    if (!message) {
       return res.status(400).json({ message: 'Content is required.' });
     }
   
     try {
-      const query = `UPDATE posts SET content = $1, created_at = CURRENT_TIMESTAMP WHERE post_id = $2 RETURNING *;`;
+      const query = `UPDATE messages SET messages = $1, timestamp = CURRENT_TIMESTAMP WHERE message_id = $2 RETURNING *;`;
       const { rows } = await db.query(query, [content, id]);
   
       if (rows.length === 0) {
@@ -62,7 +61,7 @@ editPostRouter.delete('/:id', async (req, res) => {
 
     try {
       // we delete a post with that id
-      const query = `DELETE FROM posts WHERE post_id = $1 RETURNING *`;
+      const query = `DELETE FROM messages WHERE message_id = $1 RETURNING *`;
       const { rows } = await db.query(query, [id]);
 
       // if post isn't found, send an error message

@@ -2,6 +2,7 @@
 CREATE TABLE Users (
     user_id SERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
+    user_name VARCHAR(255) UNIQUE NOT NULL, --Added user_name
     password_hash TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

@@ -31,18 +31,18 @@ favouriteRouter.post("/add", async (req, res) => {
 // Unfavourite a movie
 favouriteRouter.delete("/remove", async (req, res) => {
   const { user_id } = req.user;
-  const { movie_id } = req.body;
+  const { id } = req.body;
 
   if (!user_id || !movie_id) {
-    return res.status(400).json({ error: "user_id and movie_id are required" });
+    return res.status(400).json({ error: "id is required" });
   }
 
   try {
     const query = `
             DELETE FROM Favourites
-            WHERE user_id = $1 AND movie_id = $2;
+            WHERE user_id = $1 AND id = $2;
         `;
-    await pool.query(query, [user_id, movie_id]);
+    await pool.query(query, [user_id, id]);
     res
       .status(200)
       .json({ message: "Movie removed from favorites successfully" });

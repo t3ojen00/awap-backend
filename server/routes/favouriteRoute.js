@@ -33,7 +33,7 @@ favouriteRouter.delete("/remove", async (req, res) => {
   const { user_id } = req.user;
   const { id } = req.body;
 
-  if (!user_id || !movie_id) {
+  if (!user_id || !id) {
     return res.status(400).json({ error: "id is required" });
   }
 

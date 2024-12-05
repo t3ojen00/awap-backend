@@ -20,7 +20,7 @@ const getToken = (email) => {
   }
 };
 
-const insertTestUser = async (email, password) => {
+const insertTestUser = async (email, user_name, password) => {
   try {
     const hashedPassword = await new Promise((resolve, reject) => {
       hash(password, 10, (err, hash) => {
@@ -31,8 +31,8 @@ const insertTestUser = async (email, password) => {
 
     // Insert the user and return the userId
     const result = await pool.query(
-      "INSERT INTO Users (email, password_hash) VALUES ($1, $2) RETURNING user_id",
-      [email, hashedPassword]
+      "INSERT INTO Users (email, user_name, password_hash) VALUES ($1, $2, $3) RETURNING user_id",
+      [email, user_name, hashedPassword]
     );
 
     const userId = result.rows[0].user_id;

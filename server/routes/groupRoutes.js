@@ -150,39 +150,14 @@ groupRouter.post("/:groupId/leave", authToken, async (req, res) => {
   }
 });
 
-groupRouter.get("/:groupId/membership", authToken, async (req, res) => {
+groupRouter.get("/:groupId/member-requests", authToken, async (req, res) => {
   const { groupId } = req.params;
-  const userId = req.user.user_id; // Extract user_id from the auth token
-
-  try {
-    const membership = await pool.query(
-      "SELECT role FROM GroupMemberships WHERE group_id = $1 AND user_id = $2",
-      [groupId, userId]
-    );
-
-    if (membership.rows.length === 0) {
-      // User is not a member of the group
-      return res.status(200).json({ isMember: false });
-    }
-
-    // User is a member, include their role
-    const { role } = membership.rows[0];
-    return res.status(200).json({ isMember: true, role });
-  } catch (err) {
-    console.error("Error checking membership status:", err);
-    return res
-      .status(500)
-      .json({ error: "Failed to check membership status." });
-  }
-});
-
-groupRouter.get("/:groupId/join-requests", async (req, res) => {
-  const { groupId } = req.params;
+  const userId = req.user.user_id;
 
   try {
     const result = await pool.query(
       `
-      SELECT gm.user_id, gm.role, gm.status, u.user_name AS user_name
+      SELECT gm.user_id, u.user_name
       FROM GroupMemberships gm
       JOIN Users u ON gm.user_id = u.user_id
       WHERE gm.group_id = $1 AND gm.status = 'pending'
@@ -190,39 +165,46 @@ groupRouter.get("/:groupId/join-requests", async (req, res) => {
       [groupId]
     );
 
-    res.status(200).json(result.rows); // Include role and email in the response
+    return res.status(200).json(result.rows);
   } catch (err) {
     console.error("Error fetching join requests:", err);
     res.status(500).json({ error: "Failed to fetch join requests." });
   }
 });
 
-groupRouter.get("/:groupId/details", async (req, res) => {
+groupRouter.get("/:groupId/member-invitated", authToken, async (req, res) => {
   const { groupId } = req.params;
+  const userId = req.user.user_id; // Get the user ID from the authenticated user token
 
   try {
+    // Query to check if the user has an invitation for the specified group
     const result = await pool.query(
       `
-      SELECT g.group_name, g.created_at, u.user_id AS admin_id, u.user_name AS admin_name
-      FROM Groups g
-      JOIN Users u ON g.owner_id = u.user_id
-      WHERE g.group_id = $1
+      SELECT gm.user_id, u.user_name, g.group_name
+      FROM GroupMemberships gm
+      JOIN Users u ON gm.user_id = u.user_id
+      JOIN Groups g ON gm.group_id = g.group_id
+      WHERE gm.user_id = $1 AND gm.group_id = $2 AND gm.status = 'invited'
       `,
-      [groupId]
+      [userId, groupId]
     );
 
+    // If no invitation is found, return a 404 error
     if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Group not found." });
+      return res.status(404).json({ error: "No invitation found." });
     }
 
-    res.status(200).json(result.rows[0]);
+    // Return the first (and only) invitation found for this user
+    return res.status(200).json(result.rows[0]);
   } catch (err) {
-    console.error("Error fetching group details:", err);
-    res.status(500).json({ error: "Failed to fetch group details." });
+    // Log the error and return a 500 error response
+    console.error("Error fetching invitations:", err);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch invitations. Please try again later." });
   }
 });
 
-//acctept from admin
 groupRouter.post("/:groupId/accept", authToken, async (req, res) => {
   const { groupId } = req.params;
   const { userId } = req.body;
@@ -282,7 +264,6 @@ groupRouter.post("/:groupId/reject", authToken, async (req, res) => {
   }
 });
 
-//checking role
 groupRouter.get("/:groupId/role", authToken, async (req, res) => {
   const { groupId } = req.params;
   const userId = req.user.user_id;
@@ -300,7 +281,7 @@ groupRouter.get("/:groupId/role", authToken, async (req, res) => {
     const { role, status } = result.rows[0];
     res.status(200).json({
       isMember: status === "accepted",
-      isInvited: status === "pending",
+      isInvited: status === "invited",
       role,
     });
   } catch (err) {
@@ -423,7 +404,7 @@ groupRouter.post("/:groupId/invite", authToken, async (req, res) => {
 
     await pool.query(
       "INSERT INTO GroupMemberships (group_id, user_id, role, status) VALUES ($1, $2, $3, $4)",
-      [groupId, userId, "pending", "pending"]
+      [groupId, userId, "pending", "invited"]
     );
 
     res.status(200).json({ message: "Invitation sent successfully." });
@@ -441,7 +422,7 @@ groupRouter.post("/:groupId/respond", authToken, async (req, res) => {
 
   try {
     const checkInvite = await pool.query(
-      "SELECT * FROM GroupMemberships WHERE group_id = $1 AND user_id = $2 AND status = 'pending'",
+      "SELECT * FROM GroupMemberships WHERE group_id = $1 AND user_id = $2 AND status = 'invited'",
       [groupId, userId]
     );
 

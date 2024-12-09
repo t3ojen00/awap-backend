@@ -9,30 +9,10 @@ console.log('review router executed');
 const reviewRouter = express.Router();
 const MOVIE_API_BASE_URL = "https://www.finnkino.fi/xml/Schedule/";
 
-
-  reviewRouter.post('/', authToken, async (req, res) => {
-  try {
-    const { review, movie_id, user_id, movie_name } = req.body;
-
-    // Insert the new review
-    const newReview = await db.query(
-      `INSERT INTO movie_reviews (review, movie_id, user_id, movie_name)
-         VALUES ($1, $2, $3, $4)
-         RETURNING review, movie_id, user_id, movie_name`,
-      [review, movie_id, user_id, movie_name]
-    );
-    res.status(200).send(newReview.rows);
-
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).send("Internal Server Error");
-  }
-});
-
-// Get reviews for a specific movies
+// POST to add a review
 reviewRouter.post("/", authToken, async (req, res) => {
   try {
-    const { review, movie_id, user_id } = req.body;
+    const { review, movie_id, user_id, movie_name } = req.body;
 
     // Check if the movie exists via the movie API
     const movieResponse = await axios.get(`${MOVIE_API_BASE_URL}/${movie_id}`);
@@ -42,10 +22,10 @@ reviewRouter.post("/", authToken, async (req, res) => {
 
     // Insert the new review
     const newReview = await pool.query(
-      `INSERT INTO movie_reviews (review, movie_id, user_id)
-       VALUES ($1, $2, $3)
-       RETURNING review, movie_id, user_id`,
-      [review, movie_id, user_id]
+      `INSERT INTO movie_reviews (review, movie_id, user_id, movie_name)
+       VALUES ($1, $2, $3, $4)
+       RETURNING review, movie_id, user_id, movie_name`,
+      [review, movie_id, user_id, movie_name]
     );
     res.status(201).json(newReview.rows[0]);
   } catch (error) {
@@ -102,7 +82,6 @@ reviewRouter.delete("/:review_id", authToken, async (req, res) => {
   }
 });
 
-  module.exports = {
-    reviewRouter,
-  };
-  
+module.exports = {
+  reviewRouter,
+};
